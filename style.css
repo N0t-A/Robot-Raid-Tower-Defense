@@ -1,0 +1,3393 @@
+body, html {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: sans-serif;
+}
+
+#game {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#ground {
+    width: 100%;
+    height: 100%;
+    background: green;
+    position: absolute;
+    z-index: 0;
+    transform-origin: center center;
+}
+
+#path {
+    width: 800px;
+    height: 50px;
+    background: tan;
+    position: absolute;
+    z-index: 1;
+    transform: translate(0, 300px);
+    transform-origin: center center;
+}
+
+/* Base container */
+#base {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    transform: translate(800px, 300px) rotate(90deg);
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+/* Main wall */
+#base .wall {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 38px;
+    background: linear-gradient(to bottom, #aaa 0%, #888 100%);
+    border: 2px solid #666;
+    border-bottom: 4px solid #555;
+    border-radius: 2px;
+    box-shadow: inset 0 0 5px #666, 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 1;
+}
+
+/* Wall battlements */
+#base .wall::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: repeating-linear-gradient(
+        to right,
+        #555 0 8px,
+        #aaa 8px 12px
+    );
+    border-left: 2px solid #666;
+    border-right: 2px solid #666;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    z-index: 2;
+}
+
+/* Door */
+#base .door {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 20px;
+    background: #333;
+    border: 2px solid #222;
+    border-radius: 50% 50% 0 0; /* arch */
+    z-index: 3;
+}
+
+/* Left tower (rectangle + radial gradient for circular illusion) */
+#base .side-tower-left {
+    position: absolute;
+    bottom: 0;
+    left: -6px;
+    width: 10px;
+    height: 50px;
+    background: radial-gradient(circle at 50% 50%, #999 0%, #555 70%);
+    border-left: 2px solid #555;
+    border-right: 2px solid #555;
+    box-shadow: inset 0 0 4px #333, 0 2px 3px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+/* Right tower */
+#base .side-tower-right {
+    position: absolute;
+    bottom: 0;
+    right: -6px;
+    width: 10px;
+    height: 50px;
+    background: radial-gradient(circle at 50% 50%, #999 0%, #555 70%);
+    border-left: 2px solid #555;
+    border-right: 2px solid #555;
+    box-shadow: inset 0 0 4px #333, 0 2px 3px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+/* Tower battlements */
+#base .side-tower-left::before,
+#base .side-tower-right::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: -2px;
+    width: 14px;
+    height: 8px;
+    background: repeating-linear-gradient(
+        to right,
+        #555 0 4px,
+        #aaa 4px 6px
+    );
+    border-left: 2px solid #555;
+    border-right: 2px solid #555;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    z-index: 3;
+}
+
+/* Overlay */
+/* Overlay */
+#startScreen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+  z-index: 999;
+  opacity: 0.8;
+}
+
+/* Main content wrapper */
+#startContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;  
+  padding-top: 100px;            
+  height: 100%;                 
+}
+
+/* Generic callouts (resource/health) */
+.callout {
+  position: absolute;
+  display: flex;
+  gap: 8px;
+  max-width: 220px;
+  z-index: 1000;
+  margin: 0;
+  align-self: auto;
+  justify-self: auto;
+}
+
+/* Resource callout position */
+#resourceCallout {
+  top: 10px;
+  left: 120px;
+}
+
+/* Health callout position */
+#healthCallout {
+  top: 25px;
+  right: 120px;
+}
+
+/* Arrows */
+#resourceCallout .arrow {
+  width: 0;
+  height: 0;
+  border-right: 10px solid white;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+#healthCallout .arrow-health {
+  width: 0;
+  height: 0;
+  border-left: 10px solid white;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+/* Callout text styling */
+.callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Tower callouts */
+.tower-callout {
+  position: absolute;
+  display: flex;
+  flex-direction: column; /* stack text above arrow */
+  align-items: center;    /* center horizontally */
+  gap: 4px;
+  max-width: 220px;
+  z-index: 1000;
+}
+
+/* Arrow below tower callout text */
+.tower-callout .arrow-tower {
+  width: 0;
+  height: 0;
+  border-top: 10px solid white; /* arrow points down */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+/* Tower callout text */
+.tower-callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center; /* center text under arrow */
+}
+
+/* Example positions for tower callouts (adjust to match your cards) */
+#basicTowerCallout {
+  top: 310px;
+  left: 225px;
+  max-width: 100px;
+}
+
+#sniperTowerCallout {
+  top: 310px;
+  left: 400px;
+  max-width: 100px;
+}
+
+#cannonTowerCallout {
+  top: 310px;
+  left: 550px;
+  max-width: 100px;
+}
+
+/* Generic button callouts */
+.button-callout {
+  position: absolute;
+  display: flex;
+  flex-direction: column; /* text above arrow */
+  align-items: center;    /* center arrow under text */
+  gap: 4px;
+  max-width: 180px;
+  z-index: 1000;
+}
+
+/* Arrow pointing down toward buttons */
+.button-callout .arrow-button {
+  width: 0;
+  height: 0;
+  border-top: 10px solid white; /* arrow points down */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+/* Callout text styling */
+.button-callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;  /* center text over arrow */
+}
+
+/* Position callouts near save/load buttons (adjust as needed) */
+#saveCallout {
+  bottom: 60px;  /* space above buttons */
+  right: 85px;   /* offset to match save button */
+  max-width: 60px
+}
+
+#loadCallout {
+  bottom: 60px;  /* space above buttons */
+  right: 13px;   /* offset to match load button */
+  max-width: 60px;
+}
+
+/* Base callout */
+.base-callout {
+  position: absolute;
+  display: flex;
+  flex-direction: column; /* stack text above arrow */
+  align-items: center;    /* center arrow under text */
+  gap: 4px;
+  max-width: 180px;
+  z-index: 1000;
+}
+
+/* Arrow pointing down toward the base */
+.base-callout .arrow-base {
+  width: 0;
+  height: 0;
+  border-top: 10px solid white; /* arrow points down */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+/* Text box for base callout */
+.base-callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Position the callout near the base element */
+/* Adjust as needed based on your base transform */
+#baseCallout {
+  top: 160px;          /* slightly above the base's y-position */
+  left: 800px;         /* center-ish over the base (base is 50px wide) */
+}
+
+/* Path callout */
+.path-callout {
+  position: absolute;
+  display: flex;
+  flex-direction: column; /* text above arrow */
+  align-items: center;    /* center arrow under text */
+  gap: 4px;
+  max-width: 180px;
+  z-index: 1000;
+}
+
+/* Arrow pointing down toward the path */
+.path-callout .arrow-path {
+  width: 0;
+  height: 0;
+  border-top: 10px solid white;   /* points down */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+/* Path callout text */
+.path-callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Position near the left side, aligned vertically with the base */
+#pathCallout {
+  top: 240px;  /* same vertical as base */
+  left: 50px;  /* adjust to match path location */
+}
+
+/* Controls callout */
+.controls-callout {
+  position: absolute;
+  display: flex;
+  flex-direction: column-reverse; /* arrow above text if pointing up */
+  align-items: center;             /* center arrow and text */
+  gap: 4px;
+  max-width: 180px;
+  z-index: 1000;
+}
+
+/* Arrow pointing up toward controls */
+.controls-callout .arrow-controls {
+  width: 0;
+  height: 0;
+  border-bottom: 10px solid white;   /* arrow points up */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  flex-shrink: 0;
+}
+
+/* Callout text */
+.controls-callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* Position in lower-left corner */
+#controlsCallout {
+  bottom: 20px;
+  left: 20px;
+}
+
+.timer-callout {
+   position: absolute;
+  display: flex;
+  flex-direction: column-reverse; /* arrow above text if pointing up */
+  align-items: center;             /* center arrow and text */
+  gap: 4px;
+  max-width: 180px;
+  z-index: 1000;
+}
+
+.timer-callout .arrow-timer 
+{
+  width: 0;
+  height: 0;
+  border-bottom: 10px solid white;   /* arrow points up */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  flex-shrink: 0;
+}
+.timer-callout .callout-text {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+#timercallout {
+  top: 25px;
+}
+
+.tower {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  z-index: 2;
+
+  background-color: #6f6f6f;
+
+  background-image:
+
+    /* VERTICAL VINES (2px mortar) */
+    repeating-linear-gradient(
+      90deg,
+      rgba(40, 120, 40, 0.7) 0px,
+      rgba(40, 120, 40, 0.7) 2px,
+      transparent 2px,
+      transparent 10px
+    ),
+
+    /* HORIZONTAL VINES - ROW SET A */
+    repeating-linear-gradient(
+      0deg,
+      rgba(40, 120, 40, 0.7) 0px,
+      rgba(40, 120, 40, 0.7) 2px,
+      transparent 2px,
+      transparent 10px
+    ),
+
+    /* HORIZONTAL VINES - ROW SET B (staggered) */
+    repeating-linear-gradient(
+      0deg,
+      rgba(40, 120, 40, 0.7) 0px,
+      rgba(40, 120, 40, 0.7) 2px,
+      transparent 2px,
+      transparent 10px
+    ),
+
+    /* BRICK COLOR VARIATION */
+    repeating-linear-gradient(
+      0deg,
+      #7a7a7a 0px,
+      #7a7a7a 5px,
+      #5e5e5e 5px,
+      #5e5e5e 10px
+    );
+
+  background-size:
+    10px 100%,  /* wider columns */
+    100% 10px,
+    100% 10px,
+    100% 100%;
+
+  background-position:
+    0 0,
+    0 0,
+    5px 5px,   /* perfect stagger (half of 10) */
+    0 0;
+
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.2),
+    inset 0 -4px 6px rgba(0,0,0,0.4),
+    0 4px 6px rgba(0,0,0,0.5);
+}
+
+/* Basic Tower Gun */
+/* Basic Tower Gun */
+.tower.basic .gun {
+  position: absolute;
+  width: 6px;
+  height: 25px;
+  background: linear-gradient(#444, #111);
+  bottom: 50%; /* bottom of gun at tower center */
+  left: 50%;
+  transform: translateX(-50%); /* only center horizontally */
+  border-radius: 3px;
+  transform-origin: center bottom;
+}
+
+/* Fast Tower Gun */
+.tower.fast .gun {
+  position: absolute;
+  width: 10px;
+  height: 18px;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #333 0px,
+      #333 2px,
+      #111 2px,
+      #111 4px
+    );
+  border-radius: 4px;
+  transform-origin: center bottom;
+}
+
+/* Sniper Tower Gun */
+.tower.sniper .gun {
+  position: absolute;
+  width: 4px;
+  height: 35px;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(#555, #111);
+  border-radius: 2px;
+  transform-origin: center bottom;
+}
+
+.range-indicator {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.25); /* semi transparent black */
+    pointer-events: none; /* VERY IMPORTANT */
+    display: none;
+}
+
+/* ==========================
+   UI PANEL STYLES
+========================== */
+.ui-panel {
+    position: absolute;
+    background: rgba(0,0,0,0.8); /* matches range overlay */
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10; /* ensure on top of towers */
+}
+
+.ui-panel button {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 4px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ui-panel button.affordable {
+    background-color: lightgreen;
+    color: black;
+}
+
+.ui-panel button.unaffordable {
+    background-color: lightgray;
+    color: black;
+}
+
+/* ==========================
+   BOTTOM TOWER STATS PANEL
+========================== */
+.ui-panel-bottom {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16px;
+    z-index: 10;
+}
+
+.ui-panel-bottom .tower-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-size: 12px;
+}
+
+/* Mini tower icon inside tower stats panel */
+.ui-panel-bottom .tower-mini div {
+    margin: 2px 0;
+}
+
+/* ==========================
+   RESOURCE DISPLAY (COMPACT)
+========================== */
+#resourceDisplay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(0,0,0,0.8);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10;
+}
+
+#resourceDisplay div {
+    color: white;
+}
+
+.tower-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(0, 0, 0, 0.45); /* semi transparent */
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: white;
+
+  transition: background 0.2s ease;
+}
+
+.tower-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(0, 0, 0, 0.45); /* semi transparent */
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: white;
+
+  transition: background 0.2s ease;
+}
+
+.tower-card.selected {
+  background: rgba(0, 0, 0, 0.85); /* opaque */
+}
+
+#baseHealthDisplay {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* space between heart and fraction */
+  font-family: monospace;
+  font-size: 14px;
+  color: white;
+}
+
+/* 8-bit pixel heart */
+#baseHeart {
+  position: relative;
+  width: 8px;   /* width of bottom center block */
+  height: 8px;  /* height of bottom center block */
+  background: red;
+}
+
+/* Top-left and top-right lobes */
+#baseHeart::before,
+#baseHeart::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: red;
+  top: -8px; /* above the bottom center */
+}
+
+#baseHeart::before {
+  left: -8px;  /* left top lobe */
+}
+
+#baseHeart::after {
+  right: -8px; /* right top lobe */
+}
+
+/* Extra top-middle pixel for classic heart shape */
+#baseHeart::after:nth-child(2) {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: red;
+  top: -16px; /* above the top lobes */
+  left: 0;
+}
+
+#towerUI {
+  z-index: 100; /* ensures it is above the bottom panel */
+}
+
+#towerStatsPanel {
+  z-index: 10; /* bottom indicator */
+}
+
+/* ==========================
+   Resource Icons
+   ========================== */
+
+/* Metal (unchanged ingot example) */
+.metal-icon {
+  display: inline-block;
+  width: 16px;
+  height: 8px;
+  background: gray;
+  clip-path: polygon(0% 25%, 0% 75%, 25% 100%, 75% 100%, 100% 75%, 100% 25%, 75% 0%, 25% 0%);
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
+/* Original Energy Icon (two triangles) */
+.energy-icon {
+  display: inline-block;
+  width: 12px;
+  height: 20px;
+  position: relative;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+
+.energy-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 10px;
+  background: yellow;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.energy-icon::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 12px;
+  height: 10px;
+  background: yellow;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* Core (smaller, copper/bronze sphere with blue glow) */
+.core-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #d99a6c, #b87333); /* copper/bronze */
+  border: 2px solid #a0522d;
+  position: relative;
+  margin: 0 4px;
+  vertical-align: middle;
+}
+.core-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00f0ff, #0040aa);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 4px #00f0ff, 0 0 8px #00f0ff;
+}
+
+.enemy {
+  position: absolute;
+}
+
+.enemy::before,
+.enemy::after {
+  content: "";
+  position: absolute;
+}
+
+.enemy.grunt {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  z-index: 3px;
+  scale: 0.4;
+  transform: translateY(-55px) translateX(-75%);
+}
+
+.grunt-head {
+  position: absolute;
+
+  width: 50px;   /* head width */
+  height: 50px;  /* head height */
+
+  top: 10px;        /* can adjust later relative to enemy container */
+  left: 95px;       /* can adjust later relative to enemy container */
+
+  z-index: 3;    /* sits above body, below near arm later */
+}
+
+.grunt-faceplate {
+  position: absolute;
+
+  width: 10px;
+  height: 40px;
+  
+  right: 0px;
+  bottom: 5px;
+
+  background: #00bfff; /* electric blue */
+
+  /* makes the right side rounded */
+  border-radius: 0 20px 20px 0;
+
+  /* temporary positioning inside the 240px model box */
+
+  z-index: 5;
+}
+
+.hpanel1{
+  position:absolute;
+
+  width:20px;
+  height:25px;
+  
+  top: 0px;
+  left: 0px;
+
+  background:linear-gradient(
+    145deg,
+    #d6a84f 0%,
+    #b8862b 50%,
+    #8c5c1a 100%
+  );
+
+  border:1px solid #5a3a12;
+
+  box-shadow:
+    inset 1px 1px 2px rgba(255,255,255,0.3),
+    inset -1px -1px 2px rgba(0,0,0,0.35);
+}
+
+.hpanel2{
+  position:absolute;
+
+  width:20px;
+  height:25px;
+  
+  top: 0px;
+  left: 20px;
+
+  background:linear-gradient(
+    145deg,
+    #d6a84f 0%,
+    #b8862b 50%,
+    #8c5c1a 100%
+  );
+
+  border:1px solid #5a3a12;
+
+  box-shadow:
+    inset 1px 1px 2px rgba(255,255,255,0.3),
+    inset -1px -1px 2px rgba(0,0,0,0.35);
+}
+
+.hpanel3{
+  position:absolute;
+
+  width:20px;
+  height:25px;
+  
+  top: 25px;
+  left: 0px;
+
+  background:linear-gradient(
+    145deg,
+    #d6a84f 0%,
+    #b8862b 50%,
+    #8c5c1a 100%
+  );
+
+  border:1px solid #5a3a12;
+
+  box-shadow:
+    inset 1px 1px 2px rgba(255,255,255,0.3),
+    inset -1px -1px 2px rgba(0,0,0,0.35);
+}
+
+.hpanel4{
+  position:absolute;
+
+  width:20px;
+  height:25px;
+  
+  top: 25px;
+  left: 20px;
+
+  background:linear-gradient(
+    145deg,
+    #d6a84f 0%,
+    #b8862b 50%,
+    #8c5c1a 100%
+  );
+
+  border:1px solid #5a3a12;
+
+  box-shadow:
+    inset 1px 1px 2px rgba(255,255,255,0.3),
+    inset -1px -1px 2px rgba(0,0,0,0.35);
+}
+
+/* Panels with rivets along all four edges */
+.hpanel1::before,
+.hpanel2::before,
+.hpanel3::before,
+.hpanel4::before {
+  content: "";
+  position: absolute;
+
+  /* Top edge rivets */
+  top: 1px;
+  left: 1px;
+  width: calc(100% - 2px);
+  height: 3px;
+
+  background:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x;
+
+  background-size: 8px 3px;
+
+  /* Vertical left edge rivets */
+  background-image:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x,
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-y;
+  background-position: top left, top left;
+  background-size: 8px 3px, 3px 8px;
+}
+
+.hpanel1::after,
+.hpanel2::after,
+.hpanel3::after,
+.hpanel4::after {
+  content: "";
+  position: absolute;
+
+  /* Bottom edge rivets */
+  bottom: 1px;
+  left: 1px;
+  width: calc(100% - 2px);
+  height: 3px;
+
+  background:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x;
+
+  background-size: 8px 3px;
+
+  /* Vertical right edge rivets */
+  background-image:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x,
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-y;
+  background-position: bottom left, top right;
+  background-size: 8px 3px, 3px 8px;
+}
+
+.steam-stack{
+  position:absolute;
+
+  width:10px;
+  height:10px;
+
+  top: -10px;   /* sits above the head */
+  left: 5px;   /* roughly centered on a 50px head */
+
+  background:linear-gradient(
+    to right,
+    #6e3a16 0%,
+    #c46b2d 25%,
+    #ff9a4a 50%,
+    #c46b2d 75%,
+    #6e3a16 100%
+  );
+
+  border-radius:2px;
+
+  box-shadow:
+    inset -1px 0 1px rgba(0,0,0,0.4),
+    inset 1px 0 1px rgba(255,255,255,0.4);
+  z-index: 4px;
+}
+
+.steam-puff {
+  position: absolute;
+  width: 10px;            /* same as steam stack width */
+  height: 10px;
+  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  top: -10px;             /* above the stack */
+  left: 0;
+  transform: translateX(50%); /* center on the stack */
+  opacity: 0;              /* start invisible */
+  animation: steamRise 1s infinite;
+  z-index: 3px;
+}
+
+@keyframes steamRise {
+  0% {
+    transform: translateX(50%) translateY(0) scale(0.5);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(50%) translateY(-10px) scale(0.8);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateX(50%) translateY(-20px) scale(1);
+    opacity: 0;
+  }
+}
+
+.grunt-torso {
+  position: absolute;
+  width: 60px;
+  height: 70px;
+  z-index: 3;
+  top: 60px;
+  left: 90px;
+}
+
+/* Torso panel 1 - top-left */
+.tpanel1 {
+  position: absolute;
+  z-index: 4;
+
+  top: 0;          /* top row */
+  left: 0;         /* left column */
+
+  width: 20px;     /* 1/3 of torso width */
+  height: 35px;    /* 1/2 of torso height */
+
+  /* Brass metallic look */
+  background: linear-gradient(to bottom, #d6a84f 0%, #b8862b 100%);
+
+  border: 1px solid #8c5c1a;
+}
+
+.tpanel2 {
+  position: absolute;
+  z-index: 4;
+
+  top: 0;          /* top row */
+  left: 20px;         /* left column */
+
+  width: 20px;     /* 1/3 of torso width */
+  height: 35px;    /* 1/2 of torso height */
+
+  /* Brass metallic look */
+  background: linear-gradient(to bottom, #d6a84f 0%, #b8862b 100%);
+
+  border: 1px solid #8c5c1a;
+}
+
+.tpanel3 {
+  position: absolute;
+  z-index: 4;
+
+  top: 0;          /* top row */
+  left: 40px;         /* left column */
+
+  width: 20px;     /* 1/3 of torso width */
+  height: 35px;    /* 1/2 of torso height */
+
+  /* Brass metallic look */
+  background: linear-gradient(to bottom, #d6a84f 0%, #b8862b 100%);
+
+  border: 1px solid #8c5c1a;
+}
+
+.tpanel4 {
+  position: absolute;
+  z-index: 4;
+
+  top: 35px;          /* top row */
+  left: 0;         /* left column */
+
+  width: 20px;     /* 1/3 of torso width */
+  height: 35px;    /* 1/2 of torso height */
+
+  /* Brass metallic look */
+  background: linear-gradient(to bottom, #d6a84f 0%, #b8862b 100%);
+
+  border: 1px solid #8c5c1a;
+}
+
+.tpanel5 {
+  position: absolute;
+  z-index: 4;
+
+  top: 35px;          /* top row */
+  left: 20px;         /* left column */
+
+  width: 20px;     /* 1/3 of torso width */
+  height: 35px;    /* 1/2 of torso height */
+
+  /* Brass metallic look */
+  background: linear-gradient(to bottom, #d6a84f 0%, #b8862b 100%);
+
+  border: 1px solid #8c5c1a;
+}
+
+.tpanel6 {
+  position: absolute;
+  z-index: 4;
+
+  top: 35px;          /* top row */
+  left: 40px;         /* left column */
+
+  width: 20px;     /* 1/3 of torso width */
+  height: 35px;    /* 1/2 of torso height */
+
+  /* Brass metallic look */
+  background: linear-gradient(to bottom, #d6a84f 0%, #b8862b 100%);
+
+  border: 1px solid #8c5c1a;
+}
+
+/* Horizontal rivets: top and bottom edges */
+.tpanel1::before,
+.tpanel2::before,
+.tpanel3::before,
+.tpanel4::before,
+.tpanel5::before,
+.tpanel6::before {
+  content: "";
+  position: absolute;
+
+  left: 1px;                    /* 1px from left edge */
+  width: calc(100% - 2px);      /* full width minus edges */
+  height: 3px;
+
+  /* Top edge */
+  top: 1px;
+
+  background:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x;
+
+  background-size: 8px 3px;
+}
+
+/* Bottom edge rivets */
+.tpanel1::after,
+.tpanel2::after,
+.tpanel3::after,
+.tpanel4::after,
+.tpanel5::after,
+.tpanel6::after {
+  content: "";
+  position: absolute;
+
+  left: 1px;
+  width: calc(100% - 2px);
+  height: 3px;
+
+  bottom: 1px;
+
+  background:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x;
+
+  background-size: 8px 3px;
+}
+
+.tpanel1::before,
+.tpanel2::before,
+.tpanel3::before,
+.tpanel4::before,
+.tpanel5::before,
+.tpanel6::before {
+  background-image:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x,
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-y;
+  background-position: top left, top left;
+  background-size: 8px 3px, 3px 8px;
+}
+
+.tpanel1::after,
+.tpanel2::after,
+.tpanel3::after,
+.tpanel4::after,
+.tpanel5::after,
+.tpanel6::after {
+  background-image:
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-x,
+    radial-gradient(circle, #ff9a4a 1.5px, transparent 1.5px) repeat-y;
+  background-position: bottom left, top right;
+  background-size: 8px 3px, 3px 8px;
+}
+
+.shoulder-gear {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  transorm: translateX(-50%);
+  transform-origin: center center;
+}
+
+.tooth {
+  position: absolute;
+  width: 8px;        /* tooth width */
+  height: 15px;      /* tooth height */
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  /* Place at center of gear */
+  top: 85%;
+  left: 50%;
+
+  /* Rotate around the gear center */
+  transform-origin: 50% calc(50% - 18px); /* move origin upward by gear radius */
+  
+  /* Offset from center */
+  transform: translate(-50% 100%) rotate(0deg); /* rotate will change per tooth */
+}
+
+/* Rotate each tooth */
+.tooth1 { transform: translateX(-50%) rotate(0deg); }
+.tooth2 { transform: translateX(-50%) rotate(45deg); }
+.tooth3 { transform: translateX(-50%) rotate(90deg); }
+.tooth4 { transform: translateX(-50%) rotate(135deg); }
+.tooth5 { transform: translateX(-50%) rotate(180deg); }
+.tooth6 { transform: translateX(-50%) rotate(225deg); }
+.tooth7 { transform: translateX(-50%) rotate(270deg); }
+.tooth8 { transform: translateX(-50%) rotate(315deg); }
+
+.spoke {
+  position: absolute;
+  width: 6px;          /* thickness */
+  height: 50%;         /* reach halfway to the outer ring */
+  background: #ff9a4a;
+  border-radius: 3px;  /* rounded edges */
+  top: 0;            /* vertical centering */
+  left: 50%;           /* horizontal centering */
+  transform-origin: center bottom; 
+}
+
+.spoke1 { transform: translateX(-50%) rotate(0deg); }
+.spoke2 { transform: translateX(-50%) rotate(90deg); }
+.spoke3 { transform: translateX(-50%) rotate(180deg); }
+.spoke4 { transform: translateX(-50%) rotate(270deg); }
+
+.arm {
+  position: absolute;
+  height: 100px;
+  width: 40px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-90deg);
+  top: 60px;
+  transform-origin: 20px 20px;
+}
+
+@keyframes frontArmSwing {
+  0%   { transform: rotate(-45deg); }   /* arm up */
+  25%  { transform: rotate(-90deg); }   /* neutral */
+  50%  { transform: rotate(-135deg); }  /* arm down */
+  75%  { transform: rotate(-90deg); }   /* neutral */
+  100% { transform: rotate(-45deg); }   /* repeat */
+}
+
+@keyframes backArmSwing {
+  0%   { transform: rotate(-135deg); }  /* arm down */
+  25%  { transform: rotate(-90deg); }   /* neutral */
+  50%  { transform: rotate(-45deg); }   /* arm up */
+  75%  { transform: rotate(-90deg); }   /* neutral */
+  100% { transform: rotate(-135deg); }
+}
+
+.front-arm {
+  z-index: 5;
+  animation: frontArmSwing 0.8s linear infinite;
+}
+
+.back-arm {
+  z-index: 3px;
+  animation: backArmSwing 0.8s linear infinite;
+}
+
+.palm-gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+  box-sizing: border-box;
+
+  top: 70px;  /* adjust later to match pipe */
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);/* adjust based on arm length */
+
+  transform-origin: center center;
+}
+
+.palm-tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 85%;
+  left: 50%;
+
+  transform-origin: 50% calc(50% - 9px);
+
+  transform: translate(-50%,100%) rotate(0deg);
+}
+
+.palm-tooth1 { transform: translateX(-50%) rotate(0deg); }
+.palm-tooth2 { transform: translateX(-50%) rotate(45deg); }
+.palm-tooth3 { transform: translateX(-50%) rotate(90deg); }
+.palm-tooth4 { transform: translateX(-50%) rotate(135deg); }
+.palm-tooth5 { transform: translateX(-50%) rotate(180deg); }
+.palm-tooth6 { transform: translateX(-50%) rotate(225deg); }
+.palm-tooth7 { transform: translateX(-50%) rotate(270deg); }
+.palm-tooth8 { transform: translateX(-50%) rotate(315deg); }
+
+.palm-spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 0;
+  left: 50%;
+
+  transform-origin: center bottom;
+}
+
+.palm-spoke1 { transform: translateX(-50%) rotate(0deg); }
+.palm-spoke2 { transform: translateX(-50%) rotate(90deg); }
+.palm-spoke3 { transform: translateX(-50%) rotate(180deg); }
+.palm-spoke4 { transform: translateX(-50%) rotate(270deg); }
+
+.brass-pipe {
+  position: absolute;
+  transform-origin: 50% 100%;
+  width: 10px;      /* horizontal length */
+  height: 70px;      /* pipe thickness */
+  top: 20px;        /* vertically centered with gear (40-8)/2) */
+  left: 50%;
+  transform: translateX(-50%);
+  /* starts after shoulder gear */
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #6e4b1f 0%,
+    #b8862b 35%,
+    #e0b84f 50%,
+    #b8862b 65%,
+    #6e4b1f 100%
+  );
+}
+
+.claw {
+  position: absolute;
+  width: 4px;
+  height: 14px;
+
+  background: linear-gradient(
+    to right,
+    #8a4f1f,
+    #ff9a4a,
+    #8a4f1f
+  );
+
+  border-radius: 3px;
+
+  left: 50%;
+  top: 50%;
+
+  transform-origin: center top;
+}
+
+.claw1 {
+  transform: translate(-50%, -50%) rotate(-35deg) translateY(-14px);
+}
+
+.claw2 {
+  transform: translate(-50%, -50%) rotate(0deg) translateY(-16px);
+}
+
+.claw3 {
+  transform: translate(-50%, -50%) rotate(35deg) translateY(-14px);
+}
+
+@keyframes frontLegStep {
+  0%   { transform: translateX(-50%) rotate(25deg); }   /* step forward */
+  25%  { transform: translateX(-50%) rotate(0deg); }
+  50%  { transform: translateX(-50%) rotate(-25deg); }  /* step back */
+  75%  { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(25deg); }
+}
+
+@keyframes backLegStep {
+  0%   { transform: translateX(-50%) rotate(-25deg); }  /* back */
+  25%  { transform: translateX(-50%) rotate(0deg); }
+  50%  { transform: translateX(-50%) rotate(25deg); }   /* forward */
+  75%  { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(-25deg); }
+}
+
+.leg {
+  position: absolute;
+  width: 16px;
+  height: 80px;
+  bottom: 30px;
+  left: 50%;
+  transform-origin: top center;
+  transform: translate(-50%);
+}
+
+.front-leg {
+  z-index: 5px;
+  animation: frontLegStep 0.8s linear infinite;
+}
+
+.back-leg {
+  z-index: 3px;
+  animation: backLegStep 0.8s linear infinite;
+}
+
+.back-arm,
+.back-leg {
+  filter: brightness(0.8);
+}
+
+.leg-pipe {
+  position: absolute;
+  width: 12px;
+  height: 70px;
+
+  left: 2px;
+  top: 0;
+
+  border-radius: 6px;
+
+  background: linear-gradient(
+    to right,
+    #6e4b1f,
+    #b8862b 35%,
+    #e0b84f 50%,
+    #b8862b 65%,
+    #6e4b1f
+  );
+}
+
+.foot {
+  position: absolute;
+
+  width: 18px;
+  height: 10px;
+
+  top: 70px;
+  left: -1px;
+
+  background: linear-gradient(
+    to right,
+    #6e4b1f,
+    #b8862b,
+    #6e4b1f
+  );
+
+  border-radius: 3px;
+}
+
+.enemy.fast {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  z-index: 5px;
+  scale: 0.4;
+  transform: translateY(-40px);
+}
+
+.prop1 {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  transform-origin: center center;
+  top: 0;
+  left: 0px;
+  animation: r1 0.8s linear infinite;
+  z-index: 5px;
+}
+
+@keyframes r1 {
+  0% {transform: rotate(0deg)}
+  25% {transform: rotate(90deg)}
+  50% {transform: rotate(180deg)}
+  75% {transform: rotate(270deg)}
+  100% {transform: rotate(360deg)}
+}
+
+@keyframes r2 {
+  0% {transform: rotate(-0deg)}
+  25% {transform: rotate(-90deg)}
+  50% {transform: rotate(-180deg)}
+  75% {transform: rotate(-270deg)}
+  100% {transform: rotate(-360deg)}
+}
+
+.prop1_blade1 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(90deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop1_blade2 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-30deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop1_blade3 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-150deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop1_enclosure {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid goldenrod;
+  border-radius: 50%;
+  border-sizing: border-box;
+  transform-origin: center center;
+  left: 0;
+  top: 0;
+  z-index: 5px;
+}
+
+.prop2 {
+  position: absolute;
+  transform-origin: center center;
+  width: 45px;
+  height: 45px;
+  top: 0;
+  right: 0;
+  animation: r2 0.8s linear infinite;
+  z-index: 5px;
+}
+
+.prop2_blade1 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(90deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop2_blade2 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-30deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop2_blade3 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-150deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop2_enclosure {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid goldenrod;
+  border-radius: 50%;
+  border-sizing: border-box;
+  z-index: 5px;
+}
+
+.prop3 {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  bottom: 0;
+  left: 0;
+  animation: r2 0.8s linear infinite;
+  z-index: 5px;
+}
+
+.prop3_blade1 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(90deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop3_blade2 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-30deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop3_blade3 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-150deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop3_enclosure {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid goldenrod;
+  border-radius: 50%;
+  border-sizing: border-box;
+  top: 0;
+  left: 0;
+  z-index: 5px;
+}
+
+.prop4 {
+  transform-origin: center center;
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  bottom: 0;
+  right: 0;
+  animation: r1 0.8s linear infinite;
+  z-index: 5px;
+}
+
+.prop4_blade1 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(90deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop4_blade2 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-30deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop4_blade3 {
+  position: absolute;
+  width: 20px;
+  height: 3px;
+  background: #ff9a4a;
+  transform-origin: right center;
+  transform: rotate(-150deg);
+  top: 20px;
+  left: 2px;
+  z-index: 5px;
+}
+
+.prop4_enclosure {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid goldenrod;
+  border-radius: 50%;
+  border-sizing: border-box;
+  top: 0;
+  left: 0;
+  z-index: 5px;
+}
+
+.body {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: goldenrod;
+  transform-origin: center center;
+  clip-path: polygon(
+    16.6% 0, 83.4% 0, 100% 16.6%, 100% 83.4%,
+    83.4% 100%, 16.6% 100%, 0 83.4%, 0 16.6%
+  );
+  top: 50px;
+  left: 50px;
+  z-index: 5px;
+}
+
+.arm1 {
+  position: absolute;
+  width: 10px;
+  height: 25px;
+  transform-origin: center top;
+  transform: rotate(135deg);
+  background:linear-gradient(
+    to right,
+    #6e3a16 0%,
+    #c46b2d 25%,
+    #ff9a4a 50%,
+    #c46b2d 75%,
+    #6e3a16 100%
+  );
+  top: 55px;
+  left: 50px;
+  z-index: 5px;
+}
+
+.arm2 {
+  position: absolute;
+  width: 10px;
+  height: 25px;
+  transform-origin: center top;
+  transform: rotate(45deg);
+  background:linear-gradient(
+    to right,
+    #6e3a16 0%,
+    #c46b2d 25%,
+    #ff9a4a 50%,
+    #c46b2d 75%,
+    #6e3a16 100%
+  );
+  top: 38px;
+  right: 32px;
+  z-index: 5px;
+}
+
+.arm3 {
+  position: absolute;
+  width: 10px;
+  height: 25px;
+  transform-origin: center top;
+  transform: rotate(-45deg);
+  background:linear-gradient(
+    to right,
+    #6e3a16 0%,
+    #c46b2d 25%,
+    #ff9a4a 50%,
+    #c46b2d 75%,
+    #6e3a16 100%
+  );
+  bottom: 31px;
+  right: 50px;
+  z-index: 5px;
+}
+
+.arm4 {
+  position: absolute;
+  width: 10px;
+  height: 25px;
+  transform-origin: center top;
+  transform:  rotate(45deg);
+  background:linear-gradient(
+    to right,
+    #6e3a16 0%,
+    #c46b2d 25%,
+    #ff9a4a 50%,
+    #c46b2d 75%,
+    #6e3a16 100%
+  );
+  bottom: 31px;
+  left: 50px;
+  z-index: 5px;
+}
+
+.tank {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  transform-origin: center center;
+  scale: 0.4;
+  transform: translateY(-55px);
+}
+
+.tank_body {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 40px;
+
+  background: linear-gradient(
+    145deg,
+    #d6a84f 0%,
+    #b8862b 50%,
+    #8c5c1a 100%
+  );
+
+clip-path: polygon(
+  0% 100%,     /* lower left corner */
+  0% 37.5%,    /* up 25px */
+
+  15% 0%,      /* slope up to full height */
+  30% 0%,      /* flat section */
+
+  100% 37.5%,  /* slope down */
+  100% 100%,   /* bottom right */
+
+  0% 100%      /* close */
+);
+  border-radius: 6px;
+  overflow: visible;
+  z-index: 4;
+}
+
+.leg1 {
+  position: absolute;
+  left: 25px;   /* 20px from left of tank container */
+  top: 25px;    /* tank_body height (40px) minus 5px pivot offset */
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.leg1_upper_segment {
+  position: absolute;
+
+  width: 20px;              /* width isn’t used for the arm itself; children define visuals */
+  height: 174px;          /* example upper segment length, adjust as needed */
+
+  top: 0;                /* align top of segment to leg1 pivot */
+  left: 0;               /* center on leg1 pivot */
+
+  transform-origin: center 10px;  /* rotates around the top pivot point */
+  overflow: visible;             /* ensures children like gear are not clipped */
+}
+
+/* =======================
+   LEG1 UPPER GEAR (20px)
+   Clean, center-based system
+   ======================= */
+
+.leg1_upper_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =======================
+   TEETH (ACTUALLY FIXED)
+   ======================= */
+
+.leg1_upper_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/* Center → Rotate → Move outward */
+.leg1_upper_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg1_upper_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg1_upper_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg1_upper_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg1_upper_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg1_upper_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg1_upper_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg1_upper_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+/* =======================
+   SPOKES
+   ======================= */
+
+.leg1_upper_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+/* 4 spokes */
+.leg1_upper_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg1_upper_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg1_upper_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg1_upper_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg1_upper_pipe {
+  position: absolute;
+
+  width: 10px;
+  height: 75px;
+
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-radius: 3px;
+
+  background: linear-gradient(
+    to right,
+    #5c4a1a 0%,
+    #a88c2c 25%,
+    #ffd24a 50%,
+    #a88c2c 75%,
+    #5c4a1a 100%
+  );
+
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg1_middle_segment {
+  position: absolute;
+  width: 20px;
+  height: 105px;
+  top: 70px;
+  left: 0;
+  transform-origin: center 10px;
+  transform: translateX(-1px);
+}
+
+.leg1_middle_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =======================
+   TEETH (ACTUALLY FIXED)
+   ======================= */
+
+.leg1_middle_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/* Center → Rotate → Move outward */
+.leg1_middle_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg1_middle_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg1_middle_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg1_middle_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg1_middle_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg1_middle_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg1_middle_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg1_middle_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+/* =======================
+   SPOKES
+   ======================= */
+
+.leg1_middle_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+/* 4 spokes */
+.leg1_middle_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg1_middle_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg1_middle_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg1_middle_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg1_middle_pipe {
+  position: absolute;
+
+  width: 10px;
+  height: 67px;
+
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-radius: 3px;
+
+  background: linear-gradient(
+    to right,
+    #5c4a1a 0%,
+    #a88c2c 25%,
+    #ffd24a 50%,
+    #a88c2c 75%,
+    #5c4a1a 100%
+  );
+
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg1_lower_segment {
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  left: 0;
+  bottom: 0;
+  transform: translateX(-30%);
+  transform-origin: center 10px;
+}
+
+.leg1_lower_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =======================
+   TEETH (ACTUALLY FIXED)
+   ======================= */
+
+.leg1_lower_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/* Center → Rotate → Move outward */
+.leg1_lower_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg1_lower_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg1_lower_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg1_lower_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg1_lower_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg1_lower_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg1_lower_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg1_lower_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+/* =======================
+   SPOKES
+   ======================= */
+
+.leg1_lower_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+/* 4 spokes */
+.leg1_lower_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg1_lower_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg1_lower_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg1_lower_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg1_foot {
+  position: absolute;
+  bottom: 0;             /* attach to bottom of lower segment */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;           /* top width of trapezoid */
+  height: 30px;          /* foot height */
+  background: #d6a84f;   /* brass color */
+  clip-path: polygon(
+    0% 100%,             /* bottom left */
+    100% 100%,           /* bottom right */
+    100% 0%,             /* top right */
+    0% 0%                /* top left */
+  );
+  clip-path: polygon(
+    0% 100%,             /* bottom left */
+    100% 100%,           /* bottom right */
+    80% 0%,              /* top right */
+    20% 0%               /* top left */
+  );
+  border: 1px solid #8c5c1a; /* darker brass edge */
+}
+
+.leg2 {
+  position: absolute;
+  left: 90px;
+  top: 25px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.leg2_upper_segment {
+  position: absolute;
+  width: 20px;
+  height: 174px;
+  top: 0;
+  left: 0;
+    transform-origin: center 10px;  /* rotates around the top pivot point */
+
+  overflow: visible;
+}
+
+.leg2_upper_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leg2_upper_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+.leg2_upper_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg2_upper_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg2_upper_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg2_upper_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg2_upper_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg2_upper_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg2_upper_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg2_upper_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg2_upper_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+.leg2_upper_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg2_upper_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg2_upper_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg2_upper_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg2_upper_pipe {
+  position: absolute;
+  width: 10px;
+  height: 75px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg2_middle_segment {
+  position: absolute;
+  width: 20px;
+  height: 105px;
+  top: 70px;
+  left: 0;
+  transform-origin: center 10px;
+  transform: translateX(-1px);
+}
+
+.leg2_middle_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg2_middle_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg2_middle_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg2_middle_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg2_middle_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg2_middle_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg2_middle_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg2_middle_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg2_middle_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg2_middle_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg2_middle_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg2_middle_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg2_middle_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg2_middle_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg2_middle_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg2_middle_pipe {
+  position: absolute;
+  width: 10px;
+  height: 67px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg2_lower_segment {
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  bottom: 0;
+  transform-origin: center 10px;
+  transform: translateX(-30%);
+}
+
+.leg2_lower_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg2_lower_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg2_lower_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg2_lower_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg2_lower_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg2_lower_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg2_lower_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg2_lower_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg2_lower_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg2_lower_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg2_lower_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg2_lower_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg2_lower_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg2_lower_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg2_lower_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg2_foot {
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:40px;
+  height:30px;
+  background:#d6a84f;
+  clip-path: polygon(0% 100%,100% 100%,80% 0%,20% 0%);
+  border:1px solid #8c5c1a;
+}
+
+.leg3 {
+  position: absolute;
+  left: 155px;
+  top: 25px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.leg3_upper_segment {
+  position: absolute;
+  width: 20px;
+  height: 174px;
+  top: 0;
+  left: 0;
+    transform-origin: center 10px;  /* rotates around the top pivot point */
+
+  overflow: visible;
+}
+
+.leg3_upper_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leg3_upper_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+.leg3_upper_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg3_upper_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg3_upper_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg3_upper_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg3_upper_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg3_upper_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg3_upper_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg3_upper_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg3_upper_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+.leg3_upper_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg3_upper_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg3_upper_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg3_upper_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg3_upper_pipe {
+  position: absolute;
+  width: 10px;
+  height: 75px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg3_middle_segment {
+  position: absolute;
+  width: 20px;
+  height: 105px;
+  top: 70px;
+  left: 0;
+  transform-origin: center 10px;
+  transform: translateX(-1px);
+}
+
+.leg3_middle_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg3_middle_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg3_middle_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg3_middle_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg3_middle_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg3_middle_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg3_middle_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg3_middle_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg3_middle_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg3_middle_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg3_middle_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg3_middle_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg3_middle_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg3_middle_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg3_middle_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg3_middle_pipe {
+  position: absolute;
+  width: 10px;
+  height: 67px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg3_lower_segment {
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  bottom: 0;
+  transform-origin: center 10px;
+  transform: translateX(-30%);
+}
+
+.leg3_lower_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg3_lower_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg3_lower_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg3_lower_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg3_lower_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg3_lower_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg3_lower_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg3_lower_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg3_lower_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg3_lower_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg3_lower_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg3_lower_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg3_lower_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg3_lower_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg3_lower_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg3_foot {
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:40px;
+  height:30px;
+  background:#d6a84f;
+  clip-path: polygon(0% 100%,100% 100%,80% 0%,20% 0%);
+  border:1px solid #8c5c1a;
+}
+
+.leg4 {
+  position: absolute;
+  left: 25px;   /* 20px from left of tank container */
+  top: 25px;    /* tank_body height (40px) minus 5px pivot offset */
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 3;
+}
+
+.leg4_upper_segment {
+  position: absolute;
+
+  width: 20px;              /* width isn’t used for the arm itself; children define visuals */
+  height: 174px;          /* example upper segment length, adjust as needed */
+
+  top: 0;                /* align top of segment to leg1 pivot */
+  left: 0;               /* center on leg1 pivot */
+
+    transform-origin: center 10px;  /* rotates around the top pivot point */
+  /* rotates around the top pivot point */
+  overflow: visible;             /* ensures children like gear are not clipped */
+}
+
+/* =======================
+   LEG1 UPPER GEAR (20px)
+   Clean, center-based system
+   ======================= */
+
+.leg4_upper_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =======================
+   TEETH (ACTUALLY FIXED)
+   ======================= */
+
+.leg4_upper_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/* Center → Rotate → Move outward */
+.leg4_upper_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg4_upper_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg4_upper_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg4_upper_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg4_upper_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg4_upper_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg4_upper_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg4_upper_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+/* =======================
+   SPOKES
+   ======================= */
+
+.leg4_upper_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+/* 4 spokes */
+.leg4_upper_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg4_upper_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg4_upper_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg4_upper_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg4_upper_pipe {
+  position: absolute;
+
+  width: 10px;
+  height: 75px;
+
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-radius: 3px;
+
+  background: linear-gradient(
+    to right,
+    #5c4a1a 0%,
+    #a88c2c 25%,
+    #ffd24a 50%,
+    #a88c2c 75%,
+    #5c4a1a 100%
+  );
+
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg4_middle_segment {
+  position: absolute;
+  width: 20px;
+  height: 105px;
+  top: 70px;
+  left: 0;
+  transform-origin: center 10px;
+  transform: translateX(-1px);
+}
+
+.leg4_middle_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =======================
+   TEETH (ACTUALLY FIXED)
+   ======================= */
+
+.leg4_middle_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/* Center → Rotate → Move outward */
+.leg4_middle_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg4_middle_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg4_middle_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg4_middle_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg4_middle_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg4_middle_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg4_middle_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg4_middle_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+/* =======================
+   SPOKES
+   ======================= */
+
+.leg4_middle_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+/* 4 spokes */
+.leg4_middle_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg4_middle_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg4_middle_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg4_middle_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg4_middle_pipe {
+  position: absolute;
+
+  width: 10px;
+  height: 67px;
+
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-radius: 3px;
+
+  background: linear-gradient(
+    to right,
+    #5c4a1a 0%,
+    #a88c2c 25%,
+    #ffd24a 50%,
+    #a88c2c 75%,
+    #5c4a1a 100%
+  );
+
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg4_lower_segment {
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  bottom: 0;
+  transform-origin: center 10px;
+  transform: translateX(-30%);
+}
+
+.leg4_lower_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* =======================
+   TEETH (ACTUALLY FIXED)
+   ======================= */
+
+.leg4_lower_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+/* Center → Rotate → Move outward */
+.leg4_lower_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg4_lower_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg4_lower_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg4_lower_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg4_lower_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg4_lower_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg4_lower_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg4_lower_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+/* =======================
+   SPOKES
+   ======================= */
+
+.leg4_lower_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+/* 4 spokes */
+.leg4_lower_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg4_lower_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg4_lower_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg4_lower_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg4_foot {
+  position: absolute;
+  bottom: 0;             /* attach to bottom of lower segment */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;           /* top width of trapezoid */
+  height: 30px;          /* foot height */
+  background: #d6a84f;   /* brass color */
+  clip-path: polygon(
+    0% 100%,             /* bottom left */
+    100% 100%,           /* bottom right */
+    100% 0%,             /* top right */
+    0% 0%                /* top left */
+  );
+  clip-path: polygon(
+    0% 100%,             /* bottom left */
+    100% 100%,           /* bottom right */
+    80% 0%,              /* top right */
+    20% 0%               /* top left */
+  );
+  border: 1px solid #8c5c1a; /* darker brass edge */
+}
+
+.leg5 {
+  position: absolute;
+  left: 90px;
+  top: 25px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 3;
+}
+
+.leg5_upper_segment {
+  position: absolute;
+  width: 20px;
+  height: 174px;
+  top: 0;
+  left: 0;
+    transform-origin: center 10px;  /* rotates around the top pivot point */
+
+  overflow: visible;
+}
+
+.leg5_upper_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leg5_upper_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+.leg5_upper_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg5_upper_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg5_upper_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg5_upper_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg_upper_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg5_upper_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg5_upper_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg5_upper_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg5_upper_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+.leg5_upper_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg5_upper_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg5_upper_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg5_upper_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg5_upper_pipe {
+  position: absolute;
+  width: 10px;
+  height: 75px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg5_middle_segment {
+  position: absolute;
+  width: 20px;
+  height: 105px;
+  top: 70px;
+  left: 0;
+  transform-origin: center 10px;
+  transform: translateX(-1px);
+}
+
+.leg5_middle_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg5_middle_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg5_middle_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg5_middle_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg5_middle_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg5_middle_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg5_middle_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg_middle_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg5_middle_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg5_middle_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg5_middle_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg5_middle_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg5_middle_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg5_middle_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg5_middle_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg5_middle_pipe {
+  position: absolute;
+  width: 10px;
+  height: 67px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg5_lower_segment {
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  bottom: 0;
+  transform-origin: center 10px;
+  transform: translateX(-30%);
+}
+
+.leg5_lower_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg5_lower_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg5_lower_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg5_lower_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg5_lower_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg5_lower_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg5_lower_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg5_lower_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg5_lower_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg5_lower_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg5_lower_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg5_lower_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg5_lower_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg5_lower_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg5_lower_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg5_foot {
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:40px;
+  height:30px;
+  background:#d6a84f;
+  clip-path: polygon(0% 100%,100% 100%,80% 0%,20% 0%);
+  border:1px solid #8c5c1a;
+}
+
+.leg6 {
+  position: absolute;
+  left: 155px;
+  top: 25px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 3;
+}
+
+.leg6_upper_segment {
+  position: absolute;
+  width: 20px;
+  height: 174px;
+  top: 0;
+  left: 0;
+    transform-origin: center 10px;  /* rotates around the top pivot point */
+
+  overflow: visible;
+}
+
+.leg6_upper_gear {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff9a4a;
+  border-radius: 50%;
+  background: transparent;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leg6_upper_gear_tooth {
+  position: absolute;
+  width: 4px;
+  height: 8px;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+}
+
+.leg6_upper_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg6_upper_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg6_upper_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg6_upper_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg6_upper_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.lg6_upper_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg6_upper_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg6_upper_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg6_upper_gear_spoke {
+  position: absolute;
+  width: 3px;
+  height: 50%;
+  background: #ff9a4a;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+}
+
+.leg6_upper_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg6_upper_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg6_upper_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg6_upper_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg6_upper_pipe {
+  position: absolute;
+  width: 10px;
+  height: 75px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg6_middle_segment {
+  position: absolute;
+  width: 20px;
+  height: 105px;
+  top: 70px;
+  left: 0;
+  transform-origin: center 10px;
+  transform: translateX(-1px);
+}
+
+.leg6_middle_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg6_middle_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg6_middle_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg6_middle_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg6_middle_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg6_middle_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg6_middle_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg6_middle_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.legg_middle_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg6_middle_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg6_middle_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg6_middle_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg6_middle_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg6_middle_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg6_middle_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg6_middle_pipe {
+  position: absolute;
+  width: 10px;
+  height: 67px;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background: linear-gradient(to right,#5c4a1a 0%,#a88c2c 25%,#ffd24a 50%,#a88c2c 75%,#5c4a1a 100%);
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.4);
+}
+
+.leg6_lower_segment {
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  bottom: 0;
+  transform-origin: center 10px;
+  transform: translateX(-30%);
+}
+
+.leg6_lower_gear { position:absolute;width:20px;height:20px;border:2px solid #ff9a4a;border-radius:50%;background:transparent;top:0;left:50%;transform:translateX(-50%); }
+
+.leg6_lower_gear_tooth { position:absolute;width:4px;height:8px;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center center; }
+
+.leg6_lower_gear_tooth1 { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+.leg6_lower_gear_tooth2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-10px); }
+.leg6_lower_gear_tooth3 { transform: translate(-50%, -50%) rotate(90deg) translateY(-10px); }
+.leg6_lower_gear_tooth4 { transform: translate(-50%, -50%) rotate(135deg) translateY(-10px); }
+.leg6_lower_gear_tooth5 { transform: translate(-50%, -50%) rotate(180deg) translateY(-10px); }
+.leg6_lower_gear_tooth6 { transform: translate(-50%, -50%) rotate(225deg) translateY(-10px); }
+.leg6_lower_gear_tooth7 { transform: translate(-50%, -50%) rotate(270deg) translateY(-10px); }
+.leg6_lower_gear_tooth8 { transform: translate(-50%, -50%) rotate(315deg) translateY(-10px); }
+
+.leg6_lower_gear_spoke { position:absolute;width:3px;height:50%;background:#ff9a4a;border-radius:2px;top:50%;left:50%;transform-origin:center bottom; }
+
+.leg6_lower_gear_spoke1 { transform: translate(-50%, -100%) rotate(0deg); }
+.leg6_lower_gear_spoke2 { transform: translate(-50%, -100%) rotate(90deg); }
+.leg6_lower_gear_spoke3 { transform: translate(-50%, -100%) rotate(180deg); }
+.leg6_lower_gear_spoke4 { transform: translate(-50%, -100%) rotate(270deg); }
+
+.leg6_foot {
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:40px;
+  height:30px;
+  background:#d6a84f;
+  clip-path: polygon(0% 100%,100% 100%,80% 0%,20% 0%);
+  border:1px solid #8c5c1a;
+}
+
+.leg4,
+.leg5,
+.leg6 {
+  filter: brightness(0.8);
+}
+
+@keyframes upper_joint1 {
+  0% {transform: rotate(10deg); }
+  20% {transform: rotate(25deg); }
+  40% {transform: rotate(-20deg); }
+  60% {transform: rotate(-30deg); }
+  80% {transform: rotate(-10deg); }
+  100% {transform: rotate(10deg); }
+}
+
+@keyframes middle_joint1 {
+  0% {transform: rotate(-10deg); }
+  20% {transform: rotate(50deg); }
+  40% {transform: rotate(40deg); }
+  60% {transform: rotate(40deg);}
+  80% {transform: rotate(10deg); }
+  100% {transform: rotate(-10deg); }
+}
+
+@keyframes lower_joint1 {
+  0% {transform: translateX(-30%) rotate(0deg); }
+  20% {transform: translateX(-30%) rotate(-50deg); }
+  40% {transform: translateX(-30%) rotate(-30deg); }
+  60% {transform: translate(-30%) rotate(-10deg); }
+  80% {transform: translate(-30%); }
+  100% {transform: translate(-30%); }
+}
+
+.leg1_upper_segment,
+.leg3_upper_segment,
+.leg5_upper_segment {
+  animation: upper_joint1 2s linear infinite;
+}
+
+.leg1_middle_segment,
+.leg3_middle_segment,
+.leg5_middle_segment {
+  animation: middle_joint1 2s linear infinite;
+}
+.leg1_lower_segment,
+.leg3_lower_segment,
+.leg5_lower_segment {
+  animation: lower_joint1 2s linear infinite;
+}
+
+
+.leg2_upper_segment,
+.leg4_upper_segment,
+.leg6_upper_segment {
+  animation: upper_joint1 2s linear infinite;
+  animation-delay: 1s;
+}
+
+.leg2_middle_segment,
+.leg4_middle_segment,
+.leg6_middle_segment {
+  animation: middle_joint1 2s linear infinite;
+  animation-delay: 1s;
+}
+
+.leg2_lower_segment,
+.leg4_lower_segment,
+.leg6_lower_segment {
+  animation: lower_joint1 2s linear infinite;
+  animation-delay: 1s;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: sans-serif;
+}
+
+.overlay h1 {
+  font-size: 48px;
+  margin-bottom: 30px;
+}
+
+.overlay button {
+  padding: 10px 30px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+#placementRangeOverlay {
+  position: absolute;
+  pointer-events: none;
+  border: 2px dashed #00ff00;
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+  display: none;
+  z-index: 999;
+}
+
+#towerUpgrades button {
+  transition: all 0.2s ease;
+}
+
+.upgrade-available {
+  background: #90EE90;
+  cursor: pointer;
+}
+
+.upgrade-disabled {
+  background: #444;
+  color: #aaa;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sell-btn {
+  background: #aa0000;
+  color: white;
+}
+
+.sell-btn:hover {
+  background: #cc0000;
+}
+
+#baseUpgrades button {
+  transition: all 0.2s ease;
+}
+
+.upgrade-available {
+  background: #90EE90;
+  cursor: pointer;
+}
+
+.upgrade-disabled {
+  background: #444;
+  color: #aaa;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#saveLoadContainer {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
+
+#saveLoadContainer button {
+  padding: 8px 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  transition: 0.2s;
+}
+
+#saveLoadContainer button:hover {
+  transform: scale(1.05);
+  background: #666;
+}
+
+#saveBtn {
+  background: #2e8b57;
+}
+
+#saveBtn:hover {
+  background: #3cb371;
+}
+
+#loadBtn {
+  background: #1e90ff;
+}
+
+#loadBtn:hover {
+  background: #63b3ff;
+}
+
+#gameOverScreen {
+  position: absolute;
+  display: none;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+  z-index: 999;
+  opacity: 0.8;
+}
