@@ -1,0 +1,153 @@
+<div id="startScreen" class="overlay">
+  <!-- Main overlay content -->
+  <div id="startContent">
+    <h1>Robot Raid tower defense</h1>
+    <button id="startGameBtn">Start Game</button>
+  </div>
+
+  <!-- Resource callout -->
+  <div class="callout" id="resourceCallout">
+    <div class="arrow"></div>
+    <div class="callout-text">
+      Resources are used to build and upgrade your towers. metal and enegry are produced by your base, core is only obtained by defeating enemies
+    </div>
+  </div>
+
+  <!-- Health callout -->
+  <div class="callout" id="healthCallout">
+    <div class="callout-text">
+      This shows your base health. Keep it above 0 or else you will have to restart
+    </div>
+    <div class="arrow-health"></div>
+  </div>
+
+  <!-- Tower callouts -->
+  <div class="tower-callout" id="basicTowerCallout">
+    <div class="callout-text">
+      Basic Tower: press 1 to place this tower, medium range and fire rate
+    </div>
+    <div class="arrow-tower"></div>
+  </div>
+
+  <div class="tower-callout" id="sniperTowerCallout">
+    <div class="callout-text">
+      Sniper Tower: press 2 to place this tower, long range low fire rate
+    </div>
+    <div class="arrow-tower"></div>
+  </div>
+
+  <div class="tower-callout" id="cannonTowerCallout">
+    <div class="callout-text">
+      Auto Tower: press 3 to place this tower, short range high fire rate
+    </div>
+    <div class="arrow-tower"></div>
+  </div>
+  <!-- Save and Load button callouts -->
+<div class="button-callout" id="saveCallout">
+  <div class="callout-text">
+    Save your current game progress.
+  </div>
+  <div class="arrow-button"></div>
+</div>
+
+<div class="button-callout" id="loadCallout">
+  <div class="callout-text">
+    Load a previously saved game.
+  </div>
+  <div class="arrow-button"></div>
+</div>
+  <!-- Base callout -->
+<div class="base-callout" id="baseCallout">
+  <div class="callout-text">
+    This is your base. Protect it at all costs!
+  </div>
+  <div class="arrow-base"></div>
+</div>
+  <!-- Path callout -->
+<div class="path-callout" id="pathCallout">
+  <div class="callout-text">
+    Enemies will follow this path toward your base.
+  </div>
+  <div class="arrow-path"></div>
+</div>
+  <!-- Controls callout -->
+<div class="controls-callout" id="controlsCallout">
+  <div class="callout-text">
+    a circle will follow your mouse, it is the range of the tower you are about to place, click to place a tower, hover your mouse over a tower or the base to open the upgrade menu
+  </div>
+  <div class="arrow-controls"></div>
+</div>
+  <div class="timer-callout" id="timercallout">
+    <div class="callout-text">
+      the wave timer is here, it will display the time till the next wave, and the wave you are on when you are actively fighting a wave
+    </div>
+    <div class="arrow-timer"></div>
+  </div>
+</div>
+
+<div id="gameOverScreen" class="overlay">
+  <h1>Game Over</h1>
+  <button id="restartGameBtn">Restart Game</button>
+</div>
+<!-- Compact Resource Display -->
+<div id="resourceDisplay">
+
+  <div class="resource">
+  Metal <span class="icon metal-icon"></span>: <span id="metalAmount">50</span>
+</div>
+<div class="resource">
+  Energy <span class="icon energy-icon"></span>: <span id="energyAmount">50</span>
+</div>
+<div class="resource">
+  Core <span class="icon core-icon"></span>: <span id="coreAmount">0</span>
+</div>
+
+</div>
+
+<!-- Tower Upgrade UI -->
+<div id="towerUI" class="ui-panel" style="display:none;">
+  <div id="towerName"></div>
+  <div id="towerUpgrades"></div>
+</div>
+
+<!-- Base Upgrade UI -->
+<div id="baseUI" class="ui-panel" style="display:none;">
+  <div id="baseUpgrades"></div>
+</div>
+
+<!-- Bottom Tower Stats Panel -->
+<div id="towerStatsPanel" class="ui-panel-bottom">
+  <!-- Will be generated dynamically -->
+</div>
+
+<div id="baseHealthDisplay" class="ui-panel" style="top: 10px; right: 10px;">
+  <div id="baseHeart"></div>
+  <span id="baseHealthFraction">100/100</span>
+</div>
+
+<div id="game">
+  <div id="placementRangeOverlay"></div>
+  <div id="ground"></div>
+  <div id="path"></div>
+<div id="base">
+    <div class="side-tower-left"></div>
+    <div class="side-tower-right"></div>
+    <div class="wall"></div>
+    <div class="door"></div>
+</div>
+</div>
+
+<div id="waveCountdownDisplay" style="
+position:absolute;
+top:10px;
+right:10px;
+color:white;
+font-weight:bold;
+font-size:18px;
+"></div>
+
+<div id="saveLoadContainer">
+  <button id="saveBtn">Save</button>
+  <button id="loadBtn">Load</button>
+</div>
+<input type="file" id="hiddenLoadInput" accept=".txt" style="display:none" />
