@@ -5,6 +5,26 @@ document.getElementById("saveBtn").onclick = () => {
   saveGame();
 };
 
+const GAME_WIDTH = 850;
+const GAME_HEIGHT = 650;
+
+const game = document.getElementById("game");
+
+function resizeGame() {
+  const scaleX = window.innerWidth / GAME_WIDTH;
+  const scaleY = window.innerHeight / GAME_HEIGHT;
+
+  game.style.transform = `scale(${scaleX}, ${scaleY})`;
+  game.style.transformOrigin = "top left";
+
+  game.style.position = "absolute";
+  game.style.left = "0px";
+  game.style.top = "0px";
+}
+
+window.addEventListener("resize", resizeGame);
+resizeGame();
+
 // Create or reference a hidden file input
 let hiddenInput = document.getElementById("hiddenLoadInput");
 if (!hiddenInput) {
@@ -299,7 +319,6 @@ const towers = [];
 const enemies = [];
 const bullets = [];
 
-const game = document.getElementById("game");
 const baseElement = document.getElementById("base");
 
 let metal = 50;
@@ -385,21 +404,36 @@ updateBaseHealthDisplay();
 // ==========================
 
 function positionUIPanel(uiElement, anchorElement) {
-  const rect = anchorElement.getBoundingClientRect();
   const gameRect = game.getBoundingClientRect();
+  const anchorRect = anchorElement.getBoundingClientRect();
+
+  const scaleX = gameRect.width / GAME_WIDTH;
+  const scaleY = gameRect.height / GAME_HEIGHT;
+
   const uiWidth = uiElement.offsetWidth;
   const uiHeight = uiElement.offsetHeight;
 
-  let left = rect.right - gameRect.left + 10;
-  let top = rect.top - gameRect.top;
+  // convert anchor position into GAME SPACE
+  const left = (anchorRect.right - gameRect.left) / scaleX + 10;
+  const top = (anchorRect.top - gameRect.top) / scaleY;
 
-  if (left + uiWidth > gameRect.width) left = rect.left - gameRect.left - uiWidth - 10;
-  if (left < 10) left = 10;
-  if (top + uiHeight > gameRect.height) top = gameRect.height - uiHeight - 10;
-  if (top < 10) top = 10;
+  let finalLeft = left;
+  let finalTop = top;
 
-  uiElement.style.left = left + "px";
-  uiElement.style.top = top + "px";
+  // bounds check (in GAME SPACE)
+  const maxX = GAME_WIDTH - uiWidth;
+  const maxY = GAME_HEIGHT - uiHeight;
+
+  if (finalLeft + uiWidth > GAME_WIDTH) {
+    finalLeft = (anchorRect.left - gameRect.left) / scaleX - uiWidth - 10;
+  }
+
+  if (finalLeft < 10) finalLeft = 10;
+  if (finalTop < 10) finalTop = 10;
+  if (finalTop > maxY) finalTop = maxY;
+
+  uiElement.style.left = finalLeft + "px";
+  uiElement.style.top = finalTop + "px";
 }
 
 // ==========================
@@ -417,14 +451,19 @@ const placementOverlay = document.getElementById("placementRangeOverlay");
 
 game.addEventListener("mousemove", (e) => {
   const rect = game.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
+
+  const scaleX = rect.width / GAME_WIDTH;
+  const scaleY = rect.height / GAME_HEIGHT;
+
+  const mouseX = (e.clientX - rect.left) / scaleX;
+  const mouseY = (e.clientY - rect.top) / scaleY;
 
   placementOverlay.style.left = mouseX + "px";
   placementOverlay.style.top = mouseY + "px";
 
   const type = towerTypes[selectedTowerType];
-  if(type) {
+
+  if (type) {
     placementOverlay.style.width = type.range * 2 + "px";
     placementOverlay.style.height = type.range * 2 + "px";
     placementOverlay.style.display = "block";
@@ -438,6 +477,9 @@ game.addEventListener("mousemove", (e) => {
 // ==========================
 
 game.addEventListener("click", event => {
+  // BLOCK UI CLICKS FROM PLACING TOWERS
+  if (event.target.closest("button") || event.target.closest("#startScreen")) return;
+
   if (
     event.target.closest(".tower") ||
     event.target.closest("#base") ||
@@ -445,8 +487,12 @@ game.addEventListener("click", event => {
   ) return;
 
   const rect = game.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+
+  const scaleX = rect.width / GAME_WIDTH;
+  const scaleY = rect.height / GAME_HEIGHT;
+
+  const x = (event.clientX - rect.left) / scaleX;
+  const y = (event.clientY - rect.top) / scaleY;
 
   const gridX = Math.floor(x / gridSize) * gridSize;
   const gridY = Math.floor(y / gridSize) * gridSize;
@@ -1356,31 +1402,50 @@ function startNextWave() {
 
   enemiesToSpawn = [];
 
-  // ======================
-  // GRUNTS (core filler)
-  // ======================
-  for (let i = 0; i < currentWaveIndex + 2; i++) {
+  // ==========================
+  // EXPONENTIAL SCALING BASE
+  // ==========================
+  const wavePower = Math.pow(1.10, currentWaveIndex);
+
+  // ==========================
+  // GRUNTS (core swarm)
+  // ==========================
+  const gruntCount = Math.floor(3 * wavePower);
+
+  for (let i = 0; i < gruntCount; i++) {
     enemiesToSpawn.push("grunt");
   }
 
-  // ======================
-  // TANKS (every 5 waves)
-  // ======================
-  if (currentWaveIndex % 5 === 0) {
+  // ==========================
+  // TANKS (unlock wave 10)
+  // ==========================
+  let tankCount = 0;
+  if (currentWaveIndex >= 10) {
+    tankCount = Math.max(1, Math.floor(0.25 * wavePower));
+  }
+
+  for (let i = 0; i < tankCount; i++) {
     enemiesToSpawn.push("tank");
   }
 
-  // ======================
-  // FAST (wave 25+)
-  // ======================
-  if (currentWaveIndex >= 25) {
+  // ==========================
+  // FAST (unlock wave 5)
+  // ==========================
+  let fastCount = 0;
+  if (currentWaveIndex >= 5) {
+    fastCount = Math.max(1, Math.floor(0.15 * wavePower));
+  }
 
-    // Number increases slowly after 25
-    const fastCount = Math.floor((currentWaveIndex - 20) / 5);
+  for (let i = 0; i < fastCount; i++) {
+    enemiesToSpawn.push("fast");
+  }
 
-    for (let i = 0; i < fastCount; i++) {
-      enemiesToSpawn.push("fast");
-    }
+  // ==========================
+  // SAFETY: ensure variety
+  // (prevents empty / stale waves)
+  // ==========================
+  if (enemiesToSpawn.length === 0) {
+    enemiesToSpawn.push("grunt");
   }
 
   waveSpawning = true;
@@ -1492,31 +1557,53 @@ function handleTowerFiring(now) {
   towers.forEach(t => {
     if (now - t.lastShot <= t.fireRate) return;
 
-    const target = enemies.find(en => {
-      const dx = (t.x + 25) - (en.x + en.element.offsetWidth / 2);
-      const dy = (t.y + 25) - (en.y + en.element.offsetHeight / 2);
-      return Math.sqrt(dx*dx + dy*dy) <= t.range;
-    });
+    // ==========================
+    // FIND FRONT-MOST ENEMY IN RANGE
+    // ==========================
+    let target = null;
+    let maxProgress = -Infinity;
+
+    const towerCenterX = t.x + 25;
+    const towerCenterY = t.y + 25;
+
+    for (let i = 0; i < enemies.length; i++) {
+      const en = enemies[i];
+      if (!en || !en.element) continue;
+
+      const enemyCenterX = en.x + en.element.offsetWidth / 2;
+      const enemyCenterY = en.y + en.element.offsetHeight / 2;
+
+      const dx = towerCenterX - enemyCenterX;
+      const dy = towerCenterY - enemyCenterY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist <= t.range) {
+        // TRUE path progress (front-most enemy)
+        const progress = en.x + en.element.offsetWidth;
+
+        if (progress > maxProgress) {
+          maxProgress = progress;
+          target = en;
+        }
+      }
+    }
 
     if (!target) return;
 
     t.lastShot = now;
 
-    const gun = t.element.querySelector('.gun');
+    const gun = t.element.querySelector(".gun");
     if (!gun) return;
 
-    const centerX = t.x + 25;
-    const centerY = t.y + 25;
-
-    const dx = (target.x + target.element.offsetWidth/2) - centerX;
-    const dy = (target.y + target.element.offsetHeight/2) - centerY;
+    const dx = (target.x + target.element.offsetWidth / 2) - towerCenterX;
+    const dy = (target.y + target.element.offsetHeight / 2) - towerCenterY;
 
     const angleDeg = t.rotation;
-const gunLength = gun.offsetHeight;
-const angleRad = (angleDeg - 90) * (Math.PI / 180);
+    const gunLength = gun.offsetHeight;
+    const angleRad = (angleDeg - 90) * (Math.PI / 180);
 
-    const bulletX = centerX + Math.cos(angleRad) * gunLength;
-    const bulletY = centerY + Math.sin(angleRad) * gunLength;
+    const bulletX = towerCenterX + Math.cos(angleRad) * gunLength;
+    const bulletY = towerCenterY + Math.sin(angleRad) * gunLength;
 
     createBullet(bulletX, bulletY, target, t.damage);
   });
@@ -1611,3 +1698,52 @@ document.addEventListener("visibilitychange", () => {
     requestAnimationFrame(gameLoop);
   }
 });
+
+// ==========================
+// UI AUTO-HIDE ON HOVER (SAFE VERSION)
+// ==========================
+
+const resourceDisplay = document.getElementById("resourceDisplay");
+const towerPanel = document.getElementById("towerStatsPanel");
+
+let hoveringUIBlockers = false;
+
+function hideElement(el) {
+  el.style.opacity = "0";
+  el.style.transition = "opacity 0.15s ease";
+}
+
+function showElement(el) {
+  el.style.opacity = "1";
+  el.style.transition = "opacity 0.15s ease";
+}
+
+// --------------------------
+// RESOURCE DISPLAY
+// --------------------------
+if (resourceDisplay) {
+  resourceDisplay.addEventListener("mouseenter", () => {
+    hoveringUIBlockers = true;
+    hideElement(resourceDisplay);
+  });
+
+  resourceDisplay.addEventListener("mouseleave", () => {
+    hoveringUIBlockers = false;
+    showElement(resourceDisplay);
+  });
+}
+
+// --------------------------
+// TOWER CARDS PANEL
+// --------------------------
+if (towerPanel) {
+  towerPanel.addEventListener("mouseenter", () => {
+    hoveringUIBlockers = true;
+    hideElement(towerPanel);
+  });
+
+  towerPanel.addEventListener("mouseleave", () => {
+    hoveringUIBlockers = false;
+    showElement(towerPanel);
+  });
+}
