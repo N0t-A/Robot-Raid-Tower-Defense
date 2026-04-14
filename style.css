@@ -11,13 +11,6 @@ html, body {
   left: 0;
 }
 
-#game {
-  width: 850px;
-  height: 650px;
-  position: relative;
-  transform-origin: top left;
-}
-
 #ground {
     width: 100%;
     height: 100%;
@@ -3396,4 +3389,11 @@ clip-path: polygon(
   color: #fff;
   z-index: 999;
   opacity: 0.8;
+}
+
+#game {
+  width: 850px !important;
+  height: 650px !important;
+  position: relative;
+  transform-origin: top left;
 }
