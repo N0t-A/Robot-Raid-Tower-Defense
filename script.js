@@ -4,7 +4,6 @@ const startGameBtn = document.getElementById("startGameBtn");
 document.getElementById("saveBtn").onclick = () => {
   saveGame();
 };
-
 const GAME_WIDTH = 850;
 const GAME_HEIGHT = 650;
 
