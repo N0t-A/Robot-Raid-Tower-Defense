@@ -1,15 +1,24 @@
-body, html {
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-    font-family: sans-serif;
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#gameWrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black; /* optional */
 }
 
 #game {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+  width: 850px;
+  height: 650px;
+  position: relative;
+  transform-origin: top left;
 }
 
 #ground {
