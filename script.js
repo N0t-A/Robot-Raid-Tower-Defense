@@ -19,6 +19,10 @@ function resizeGame() {
   game.style.position = "absolute";
   game.style.left = "0px";
   game.style.top = "0px";
+
+  // ⭐ CRITICAL: store these globally for consistent mouse/UI math
+  window.gameScaleX = scaleX;
+  window.gameScaleY = scaleY;
 }
 
 window.addEventListener("resize", resizeGame);
@@ -451,8 +455,8 @@ const placementOverlay = document.getElementById("placementRangeOverlay");
 game.addEventListener("mousemove", (e) => {
   const rect = game.getBoundingClientRect();
 
-  const scaleX = rect.width / GAME_WIDTH;
-  const scaleY = rect.height / GAME_HEIGHT;
+  const scaleX = window.gameScaleX;
+  const scaleY = window.gameScaleY;
 
   const mouseX = (e.clientX - rect.left) / scaleX;
   const mouseY = (e.clientY - rect.top) / scaleY;
@@ -487,8 +491,8 @@ game.addEventListener("click", event => {
 
   const rect = game.getBoundingClientRect();
 
-  const scaleX = rect.width / GAME_WIDTH;
-  const scaleY = rect.height / GAME_HEIGHT;
+  const scaleX = window.gameScaleX;
+  const scaleY = window.gameScaleY;
 
   const x = (event.clientX - rect.left) / scaleX;
   const y = (event.clientY - rect.top) / scaleY;
